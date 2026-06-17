@@ -13,3 +13,4 @@
   * ERD (Entity Relationship Diagram)
 * Hỗ trợ phân tích yêu cầu và mô hình hóa hệ thống.
 * Kiểm tra tính nhất quán giữa tài liệu đặc tả và thiết kế hệ thống.
+jsdcjns
