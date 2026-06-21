@@ -1,4 +1,9 @@
-const sql = require('mssql/msnodesqlv8');
+let sql;
+try {
+  sql = require('mssql/msnodesqlv8');
+} catch (e) {
+  sql = require('mssql'); // Fallback cho môi trường CI (Linux) để Jest không bị crash
+}
 const dotenv = require('dotenv');
 
 dotenv.config();
