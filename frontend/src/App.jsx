@@ -124,6 +124,13 @@ function App() {
                     <td>224</td>
                     <td><span className="badge success">Còn hạn</span></td>
                   </tr>
+                  <tr className="expired-row">
+                    <td>VTM-C</td>
+                    <td>Vitamin C 500mg</td>
+                    <td>Ascorbic Acid</td>
+                    <td>0</td>
+                    <td><span className="badge secondary">Hết hạn</span></td>
+                  </tr>
                 </tbody>
               </table>
             </>
