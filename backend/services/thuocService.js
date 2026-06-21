@@ -14,6 +14,7 @@ function normalizeThuocPayload(payload) {
     hoatChat: payload.hoatChat ? payload.hoatChat.trim() : null,
     hamLuong: payload.hamLuong || null,
     phanLoai: payload.phanLoai ? payload.phanLoai.trim() : 'Khác',
+    nhomThuocID: payload.nhomThuocID ? toInt(payload.nhomThuocID, null) : null,
     donViTinh: payload.donViTinh ? payload.donViTinh.trim() : null,
     tonKhoHienTai: toInt(payload.tonKhoHienTai),
     tonToiThieu: toInt(payload.tonToiThieu),

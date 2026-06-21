@@ -3,6 +3,7 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const auditLog = require('./middleware/auditLog');
 const thuocRoutes = require('./routes/thuoc');
+const nhomThuocRoutes = require('./routes/nhomThuoc');
 
 dotenv.config();
 
@@ -14,6 +15,7 @@ app.use(express.json());
 app.use(auditLog);
 
 app.use('/api/thuoc', thuocRoutes);
+app.use('/api/nhom-thuoc', nhomThuocRoutes);
 
 app.get('/api/health', (_req, res) => {
   res.json({
