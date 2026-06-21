@@ -156,11 +156,55 @@ button {
   gap: 20px;
 }
 
+.left-column {
+  display: grid;
+  align-self: start;
+  gap: 16px;
+}
+
 .medicine-form {
   padding: 18px;
-  align-self: start;
   display: grid;
   gap: 13px;
+}
+
+.group-panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px;
+  display: grid;
+  gap: 12px;
+}
+
+.inline-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+}
+
+.group-list {
+  display: grid;
+  gap: 8px;
+}
+
+.group-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 11px;
+  border-radius: 7px;
+  background: #f8fafc;
+  color: var(--text);
+  font-size: 13px;
+}
+
+.group-item button {
+  border: 0;
+  background: transparent;
+  color: var(--danger);
+  font-weight: 700;
 }
 
 .section-heading,

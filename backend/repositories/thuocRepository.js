@@ -42,6 +42,7 @@ async function createThuoc(data) {
     .input('hoatChat', sql.NVarChar(150), data.hoatChat)
     .input('hamLuong', sql.NVarChar(50), data.hamLuong)
     .input('phanLoai', sql.NVarChar(80), data.phanLoai)
+    .input('nhomThuocID', sql.Int, data.nhomThuocID)
     .input('donViTinh', sql.NVarChar(20), data.donViTinh)
     .input('tonKhoHienTai', sql.Int, data.tonKhoHienTai)
     .input('tonToiThieu', sql.Int, data.tonToiThieu)
@@ -49,12 +50,12 @@ async function createThuoc(data) {
     .input('ngayHetHan', sql.Date, data.ngayHetHan)
     .query(`
       INSERT INTO Thuoc (
-        maATC, tenThuongMai, hoatChat, hamLuong, phanLoai, donViTinh,
+        maATC, tenThuongMai, hoatChat, hamLuong, phanLoai, nhomThuocID, donViTinh,
         tonKhoHienTai, tonToiThieu, ngaySanXuat, ngayHetHan
       )
       OUTPUT INSERTED.*
       VALUES (
-        @maATC, @tenThuongMai, @hoatChat, @hamLuong, @phanLoai, @donViTinh,
+        @maATC, @tenThuongMai, @hoatChat, @hamLuong, @phanLoai, @nhomThuocID, @donViTinh,
         @tonKhoHienTai, @tonToiThieu, @ngaySanXuat, @ngayHetHan
       )
     `);
@@ -71,6 +72,7 @@ async function updateThuoc(thuocID, data) {
     .input('hoatChat', sql.NVarChar(150), data.hoatChat)
     .input('hamLuong', sql.NVarChar(50), data.hamLuong)
     .input('phanLoai', sql.NVarChar(80), data.phanLoai)
+    .input('nhomThuocID', sql.Int, data.nhomThuocID)
     .input('donViTinh', sql.NVarChar(20), data.donViTinh)
     .input('tonKhoHienTai', sql.Int, data.tonKhoHienTai)
     .input('tonToiThieu', sql.Int, data.tonToiThieu)
@@ -83,6 +85,7 @@ async function updateThuoc(thuocID, data) {
           hoatChat = @hoatChat,
           hamLuong = @hamLuong,
           phanLoai = @phanLoai,
+          nhomThuocID = @nhomThuocID,
           donViTinh = @donViTinh,
           tonKhoHienTai = @tonKhoHienTai,
           tonToiThieu = @tonToiThieu,
