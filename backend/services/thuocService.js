@@ -1,4 +1,5 @@
 const thuocRepository = require('../repositories/thuocRepository');
+const { getAtcMessage, normalizeAtc } = require('../utils/atcValidator');
 
 function toInt(value, fallback = 0) {
   const parsed = Number.parseInt(value, 10);
@@ -7,7 +8,7 @@ function toInt(value, fallback = 0) {
 
 function normalizeThuocPayload(payload) {
   return {
-    maATC: payload.maATC ? payload.maATC.trim().toUpperCase() : null,
+    maATC: normalizeAtc(payload.maATC),
     tenThuongMai: payload.tenThuongMai ? payload.tenThuongMai.trim() : null,
     hoatChat: payload.hoatChat ? payload.hoatChat.trim() : null,
     hamLuong: payload.hamLuong || null,
@@ -22,7 +23,8 @@ function normalizeThuocPayload(payload) {
 function validateRequiredFields(data) {
   const errors = [];
 
-  if (!data.maATC) errors.push('Ma ATC la bat buoc');
+  const atcMessage = getAtcMessage(data.maATC);
+  if (atcMessage) errors.push(atcMessage);
   if (!data.tenThuongMai) errors.push('Ten thuoc la bat buoc');
   if (!data.hoatChat) errors.push('Hoat chat la bat buoc');
   if (!data.donViTinh) errors.push('Don vi tinh la bat buoc');

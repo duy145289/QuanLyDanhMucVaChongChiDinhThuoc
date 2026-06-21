@@ -13,6 +13,8 @@ const emptyForm = {
   ngayHetHan: ''
 };
 
+const atcPattern = /^[A-Z][0-9]{2}[A-Z]{2}[0-9]{2}$/;
+
 const sampleMedicines = [
   {
     thuocID: 1,
@@ -67,6 +69,7 @@ function App() {
   const [form, setForm] = useState(emptyForm);
   const [query, setQuery] = useState('');
   const [notice, setNotice] = useState('Đang dùng dữ liệu mẫu nếu backend chưa sẵn sàng.');
+  const [formError, setFormError] = useState('');
   const [loading, setLoading] = useState(false);
 
   async function loadMedicines() {
@@ -101,6 +104,7 @@ function App() {
   }, [medicines, query]);
 
   function updateField(field, value) {
+    if (formError) setFormError('');
     setForm((current) => ({ ...current, [field]: value }));
   }
 
@@ -123,6 +127,11 @@ function App() {
       tonKhoHienTai: Number(form.tonKhoHienTai),
       tonToiThieu: Number(form.tonToiThieu)
     };
+
+    if (!atcPattern.test(payload.maATC)) {
+      setFormError('Mã ATC phải đúng định dạng, ví dụ J01CA04.');
+      return;
+    }
 
     const method = form.thuocID ? 'PUT' : 'POST';
     const url = form.thuocID ? `/api/thuoc/${form.thuocID}` : '/api/thuoc';
@@ -220,8 +229,14 @@ function App() {
 
             <label>
               Mã ATC
-              <input value={form.maATC} onChange={(event) => updateField('maATC', event.target.value)} required />
+              <input
+                value={form.maATC}
+                onChange={(event) => updateField('maATC', event.target.value.toUpperCase())}
+                placeholder="J01CA04"
+                required
+              />
             </label>
+            {formError && <p className="form-error">{formError}</p>}
             <label>
               Tên thương mại
               <input value={form.tenThuongMai} onChange={(event) => updateField('tenThuongMai', event.target.value)} required />
