@@ -62,4 +62,48 @@ router.post('/login', async (req, res) => {
     }
 });
 
+// API Đăng ký người dùng mới (Hash mật khẩu)
+router.post('/register', async (req, res) => {
+    const { tenDangNhap, matKhau, hoTen, vaiTro } = req.body;
+    
+    if (!tenDangNhap || !matKhau) {
+        return res.status(400).json({ message: 'Vui lòng cung cấp tên đăng nhập và mật khẩu!' });
+    }
+
+    try {
+        const pool = await poolPromise;
+        
+        // 1. Kiểm tra tài khoản đã tồn tại chưa
+        const checkUser = await pool.request()
+            .input('tenDangNhap', sql.VarChar(50), tenDangNhap)
+            .query('SELECT userId FROM NguoiDung WHERE tenDangNhap = @tenDangNhap');
+            
+        if (checkUser.recordset.length > 0) {
+            return res.status(400).json({ message: 'Tên đăng nhập đã tồn tại!' });
+        }
+
+        // 2. Mã hóa (Hash) mật khẩu bằng bcrypt
+        const salt = await bcrypt.genSalt(10);
+        const matKhauHash = await bcrypt.hash(matKhau, salt);
+
+        // 3. Lưu vào Cơ sở dữ liệu
+        await pool.request()
+            .input('tenDangNhap', sql.VarChar(50), tenDangNhap)
+            .input('matKhauHash', sql.VarChar(255), matKhauHash)
+            .input('hoTen', sql.NVarChar(100), hoTen || '')
+            .input('vaiTro', sql.NVarChar(50), vaiTro || 'Nhân viên')
+            .input('trangThai', sql.Int, 1) // 1 là đang hoạt động
+            .query(`
+                INSERT INTO NguoiDung (tenDangNhap, matKhauHash, hoTen, vaiTro, trangThai)
+                VALUES (@tenDangNhap, @matKhauHash, @hoTen, @vaiTro, @trangThai)
+            `);
+
+        res.status(201).json({ message: 'Tạo tài khoản thành công! Mật khẩu đã được mã hóa an toàn.' });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Lỗi server khi tạo tài khoản' });
+    }
+});
+
 module.exports = router;
