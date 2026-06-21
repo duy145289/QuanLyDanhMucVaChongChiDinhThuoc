@@ -30,6 +30,25 @@ router.get('/search', async (req, res) => {
   }
 });
 
+// Lấy danh sách thuốc sắp hết hàng (tồn hiện tại < tồn tối thiểu)
+router.get('/low-inventory', async (req, res) => {
+  try {
+    const pool = await poolPromise;
+    const result = await pool.request().query(`
+      SELECT * FROM Thuoc 
+      WHERE tonKhoHienTai < tonToiThieu AND trangThai = 1
+    `);
+    
+    res.json({
+      count: result.recordset.length,
+      data: result.recordset
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Lỗi server khi tính toán tồn tối thiểu' });
+  }
+});
+
 // Thêm thuốc mới (Chỉ Admin hoặc Bác sĩ)
 router.post('/', verifyToken, checkRole(['Admin', 'BacSi']), async (req, res) => {
   const { maATC, tenThuongMai, hoatChat, hamLuong, donViTinh, tonKhoHienTai, tonToiThieu, ngaySanXuat, ngayHetHan } = req.body;
