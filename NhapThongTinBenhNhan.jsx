@@ -88,6 +88,18 @@ export default function NhapThongTinBenhNhan() {
     setIsSuccess(false);
 
     if (validate()) {
+      // Tính tuổi (Mô phỏng hàm tinhTuoi() trong class diagram)
+      const birthDate = new Date(formData.ngaySinh);
+      const today = new Date();
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const m = today.getMonth() - birthDate.getMonth();
+      if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+      }
+
+      console.log('Dữ liệu hợp lệ, Chuẩn bị lưu DB:', {
+        ...formData,
+        tuoi: age,
       console.log('Dữ liệu hợp lệ, Chuẩn bị lưu DB:', {
         ...formData,
         tuoi: tuoiHienTai,
@@ -206,6 +218,10 @@ export default function NhapThongTinBenhNhan() {
                 value={formData.tienSuBenh}
                 onChange={handleChange}
                 rows="4"
+                className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-100 focus:border-blue-500 outline-none transition-all"
+                placeholder="Nhập các bệnh lý nền, dị ứng (nếu có)..."
+              ></textarea>
+              <p className="text-xs text-gray-500">Thông tin này rất quan trọng để hệ thống Quét chống chỉ định tự động (CCD).</p>
                 className={`w-full p-3 border rounded-lg focus:ring-2 outline-none transition-all ${errors.tienSuBenh ? 'border-red-300 focus:ring-red-200' : 'border-gray-200 focus:ring-blue-100 focus:border-blue-500'}`}
                 placeholder="Nhập các bệnh lý nền, dị ứng (nếu có)..."
               ></textarea>
@@ -220,6 +236,7 @@ export default function NhapThongTinBenhNhan() {
           <div className="pt-6 border-t border-gray-100 flex justify-end gap-3">
             <button
               type="button"
+              onClick={() => setFormData({ hoTen: '', ngaySinh: '', canNang: '', tienSuBenh: '', isMangThai: false })}
               onClick={() => {
                 setFormData({ hoTen: '', ngaySinh: '', canNang: '', tienSuBenh: '', isMangThai: false });
                 setTuoiHienTai(null);
