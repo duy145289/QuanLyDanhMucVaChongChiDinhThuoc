@@ -1,6 +1,7 @@
 const express = require('express');
 const { verifyToken, checkRole } = require('../middleware/auth');
 const thuocService = require('../services/thuocService');
+const { MEDICINE_CATEGORIES, MEDICINE_UNITS } = require('../constants/medicineCatalog');
 
 const router = express.Router();
 
@@ -11,6 +12,13 @@ function handleRouteError(res, error, fallbackMessage) {
     details: error.details || undefined
   });
 }
+
+router.get('/meta/options', (_req, res) => {
+  return res.json({
+    categories: MEDICINE_CATEGORIES,
+    units: MEDICINE_UNITS
+  });
+});
 
 router.get('/', async (req, res) => {
   const keyword = (req.query.q || '').trim();

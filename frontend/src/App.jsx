@@ -1,19 +1,22 @@
 import { useEffect, useMemo, useState } from 'react';
 
+const categoryOptions = ['Kháng sinh', 'Giảm đau - hạ sốt', 'Tim mạch', 'Tiêu hóa', 'Hô hấp', 'Dị ứng', 'Vitamin - khoáng chất', 'Khác'];
+const unitOptions = ['viên', 'vỉ', 'hộp', 'chai', 'ống', 'gói', 'tuýp', 'lọ'];
+const atcPattern = /^[A-Z][0-9]{2}[A-Z]{2}[0-9]{2}$/;
+
 const emptyForm = {
   thuocID: null,
   maATC: '',
   tenThuongMai: '',
   hoatChat: '',
   hamLuong: '',
+  phanLoai: 'Kháng sinh',
   donViTinh: 'viên',
   tonKhoHienTai: 0,
   tonToiThieu: 10,
   ngaySanXuat: '',
   ngayHetHan: ''
 };
-
-const atcPattern = /^[A-Z][0-9]{2}[A-Z]{2}[0-9]{2}$/;
 
 const sampleMedicines = [
   {
@@ -22,6 +25,7 @@ const sampleMedicines = [
     tenThuongMai: 'Amoxicillin 500mg',
     hoatChat: 'Amoxicillin',
     hamLuong: '500mg',
+    phanLoai: 'Kháng sinh',
     donViTinh: 'viên',
     tonKhoHienTai: 348,
     tonToiThieu: 80,
@@ -33,6 +37,7 @@ const sampleMedicines = [
     tenThuongMai: 'Paracetamol 500mg',
     hoatChat: 'Paracetamol',
     hamLuong: '500mg',
+    phanLoai: 'Giảm đau - hạ sốt',
     donViTinh: 'viên',
     tonKhoHienTai: 72,
     tonToiThieu: 120,
@@ -44,6 +49,7 @@ const sampleMedicines = [
     tenThuongMai: 'Lisinopril 10mg',
     hoatChat: 'Lisinopril',
     hamLuong: '10mg',
+    phanLoai: 'Tim mạch',
     donViTinh: 'hộp',
     tonKhoHienTai: 24,
     tonToiThieu: 30,
@@ -100,6 +106,7 @@ function App() {
       medicine.maATC?.toLowerCase().includes(keyword)
       || medicine.tenThuongMai?.toLowerCase().includes(keyword)
       || medicine.hoatChat?.toLowerCase().includes(keyword)
+      || medicine.phanLoai?.toLowerCase().includes(keyword)
     ));
   }, [medicines, query]);
 
@@ -112,6 +119,7 @@ function App() {
     setForm({
       ...emptyForm,
       ...medicine,
+      phanLoai: medicine.phanLoai || 'Khác',
       ngaySanXuat: medicine.ngaySanXuat?.slice(0, 10) || '',
       ngayHetHan: medicine.ngayHetHan?.slice(0, 10) || ''
     });
@@ -179,6 +187,7 @@ function App() {
 
   const totalStock = medicines.reduce((sum, item) => sum + Number(item.tonKhoHienTai || 0), 0);
   const lowStockCount = medicines.filter((item) => Number(item.tonKhoHienTai) <= Number(item.tonToiThieu)).length;
+  const categoryCount = new Set(medicines.map((item) => item.phanLoai || 'Khác')).size;
 
   return (
     <main className="app-shell">
@@ -214,6 +223,10 @@ function App() {
             <span>Cần nhập thêm</span>
             <strong>{lowStockCount}</strong>
           </article>
+          <article>
+            <span>Phân loại</span>
+            <strong>{categoryCount}</strong>
+          </article>
         </section>
 
         <section className="content-grid">
@@ -247,14 +260,22 @@ function App() {
             </label>
             <div className="form-row">
               <label>
-                Hàm lượng
-                <input value={form.hamLuong} onChange={(event) => updateField('hamLuong', event.target.value)} />
+                Phân loại
+                <select value={form.phanLoai} onChange={(event) => updateField('phanLoai', event.target.value)}>
+                  {categoryOptions.map((category) => <option key={category} value={category}>{category}</option>)}
+                </select>
               </label>
               <label>
                 Đơn vị
-                <input value={form.donViTinh} onChange={(event) => updateField('donViTinh', event.target.value)} required />
+                <select value={form.donViTinh} onChange={(event) => updateField('donViTinh', event.target.value)} required>
+                  {unitOptions.map((unit) => <option key={unit} value={unit}>{unit}</option>)}
+                </select>
               </label>
             </div>
+            <label>
+              Hàm lượng
+              <input value={form.hamLuong} onChange={(event) => updateField('hamLuong', event.target.value)} />
+            </label>
             <div className="form-row">
               <label>
                 Tồn kho
@@ -279,7 +300,7 @@ function App() {
               <h3>Danh sách thuốc</h3>
               <input
                 aria-label="Tìm kiếm thuốc"
-                placeholder="Tìm mã ATC, tên thuốc, hoạt chất"
+                placeholder="Tìm mã ATC, tên thuốc, hoạt chất, phân loại"
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
               />
@@ -291,6 +312,7 @@ function App() {
                   <tr>
                     <th>Mã ATC</th>
                     <th>Tên thuốc</th>
+                    <th>Phân loại</th>
                     <th>Hoạt chất</th>
                     <th>Tồn kho</th>
                     <th>Hạn dùng</th>
@@ -308,6 +330,7 @@ function App() {
                           <strong>{medicine.tenThuongMai}</strong>
                           <small>{medicine.hamLuong || 'Chưa nhập hàm lượng'}</small>
                         </td>
+                        <td>{medicine.phanLoai || 'Khác'}</td>
                         <td>{medicine.hoatChat}</td>
                         <td>{medicine.tonKhoHienTai} {medicine.donViTinh}</td>
                         <td>{formatDate(medicine.ngayHetHan)}</td>
