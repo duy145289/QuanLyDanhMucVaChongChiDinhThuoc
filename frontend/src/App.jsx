@@ -51,6 +51,10 @@ function App() {
                   <div className="stat-title">Tổng số thuốc</div>
                   <div className="stat-value">1,245</div>
                 </div>
+                <div className="stat-card danger">
+                  <div className="stat-title">Sắp hết hàng (Dưới mức tối thiểu)</div>
+                  <div className="stat-value">15</div>
+                </div>
                 <div className="stat-card warning">
                   <div className="stat-title">Sắp hết hạn</div>
                   <div className="stat-value">28</div>
@@ -61,28 +65,28 @@ function App() {
                 </div>
               </div>
 
-              <h2 className="section-title">Cảnh báo an toàn gần đây</h2>
+              <h2 className="section-title">Cảnh báo hệ thống gần đây</h2>
               <table className="data-table">
                 <thead>
                   <tr>
                     <th>Thời gian</th>
-                    <th>Thuốc kiểm tra</th>
+                    <th>Nội dung cảnh báo</th>
                     <th>Mức độ</th>
-                    <th>Nguồn</th>
+                    <th>Người xử lý</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr>
-                    <td>20/05/2026 09:15</td>
-                    <td>Amoxicillin + Warfarin</td>
-                    <td><span className="badge danger">Tuyệt đối</span></td>
-                    <td>Trần Minh Anh</td>
+                    <td>Hôm nay 08:30</td>
+                    <td>Thuốc <b>Ibuprofen 400mg</b> tồn kho hiện tại (12) rớt xuống dưới mức tối thiểu (50). Đề nghị nhập thêm!</td>
+                    <td><span className="badge warning">Cảnh báo Tồn kho</span></td>
+                    <td>Hệ thống</td>
                   </tr>
                   <tr>
-                    <td>19/05/2026 14:20</td>
-                    <td>Paracetamol + Ibuprofen</td>
-                    <td><span className="badge warning">Thận trọng</span></td>
-                    <td>Nguyễn Thu Hương</td>
+                    <td>20/05/2026 09:15</td>
+                    <td>Kê đơn Amoxicillin + Warfarin (Tương tác thuốc)</td>
+                    <td><span className="badge danger">Tuyệt đối</span></td>
+                    <td>Trần Minh Anh</td>
                   </tr>
                 </tbody>
               </table>
@@ -110,18 +114,14 @@ function App() {
                     <td>348</td>
                     <td><span className="badge success">Còn hạn</span></td>
                   </tr>
-                  <tr>
-                    <td>PAR500</td>
-                    <td>Paracetamol 500mg</td>
-                    <td>Paracetamol</td>
-                    <td>273</td>
-                    <td><span className="badge success">Còn hạn</span></td>
-                  </tr>
-                  <tr>
-                    <td>LISI10</td>
-                    <td>Lisinopril 10mg</td>
-                    <td>Lisinopril</td>
-                    <td>224</td>
+                  <tr style={{ backgroundColor: '#fffbeb' }}>
+                    <td>IBU400</td>
+                    <td>Ibuprofen 400mg</td>
+                    <td>Ibuprofen</td>
+                    <td style={{ color: '#d97706', fontWeight: 'bold' }}>
+                      12 <span style={{fontSize: '12px', fontWeight: 'normal'}}> / 50 (Tối thiểu)</span>
+                      <br/><span className="badge warning" style={{marginTop: '4px', display: 'inline-block'}}>Sắp hết hàng</span>
+                    </td>
                     <td><span className="badge success">Còn hạn</span></td>
                   </tr>
                 </tbody>
