@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 
 const categoryOptions = ['Kháng sinh', 'Giảm đau - hạ sốt', 'Tim mạch', 'Tiêu hóa', 'Hô hấp', 'Dị ứng', 'Vitamin - khoáng chất', 'Khác'];
 const unitOptions = ['viên', 'vỉ', 'hộp', 'chai', 'ống', 'gói', 'tuýp', 'lọ'];
+const solidUnitFactors = { viên: 1, vỉ: 10, hộp: 100 };
 const atcPattern = /^[A-Z][0-9]{2}[A-Z]{2}[0-9]{2}$/;
 
 const sampleGroups = [
@@ -84,6 +85,7 @@ function App() {
   const [medicines, setMedicines] = useState(sampleMedicines);
   const [groups, setGroups] = useState(sampleGroups);
   const [newGroupName, setNewGroupName] = useState('');
+  const [converter, setConverter] = useState({ quantity: 1, fromUnit: 'hộp', toUnit: 'viên' });
   const [form, setForm] = useState(emptyForm);
   const [query, setQuery] = useState('');
   const [notice, setNotice] = useState('Đang dùng dữ liệu mẫu nếu backend chưa sẵn sàng.');
@@ -93,6 +95,18 @@ function App() {
   const groupNameById = useMemo(() => {
     return groups.reduce((map, group) => ({ ...map, [group.nhomThuocID]: group.tenNhom }), {});
   }, [groups]);
+
+  const conversionResult = useMemo(() => {
+    const quantity = Number(converter.quantity);
+    if (!Number.isFinite(quantity) || quantity < 0) return 'Số lượng không hợp lệ';
+    if (converter.fromUnit === converter.toUnit) return `${quantity} ${converter.toUnit}`;
+    if (!solidUnitFactors[converter.fromUnit] || !solidUnitFactors[converter.toUnit]) {
+      return 'Chỉ hỗ trợ đổi giữa hộp, vỉ và viên';
+    }
+
+    const result = (quantity * solidUnitFactors[converter.fromUnit]) / solidUnitFactors[converter.toUnit];
+    return `${Number(result.toFixed(2))} ${converter.toUnit}`;
+  }, [converter]);
 
   async function loadInitialData() {
     setLoading(true);
@@ -134,6 +148,10 @@ function App() {
   function updateField(field, value) {
     if (formError) setFormError('');
     setForm((current) => ({ ...current, [field]: value }));
+  }
+
+  function updateConverter(field, value) {
+    setConverter((current) => ({ ...current, [field]: value }));
   }
 
   function editMedicine(medicine) {
@@ -361,6 +379,33 @@ function App() {
                     <button type="button" onClick={() => deleteGroup(group.nhomThuocID)}>Xóa</button>
                   </div>
                 ))}
+              </div>
+            </section>
+
+            <section className="group-panel">
+              <div className="section-heading">
+                <h3>Đổi đơn vị</h3>
+              </div>
+              <div className="converter-grid">
+                <label>
+                  Số lượng
+                  <input type="number" min="0" value={converter.quantity} onChange={(event) => updateConverter('quantity', event.target.value)} />
+                </label>
+                <label>
+                  Từ
+                  <select value={converter.fromUnit} onChange={(event) => updateConverter('fromUnit', event.target.value)}>
+                    {unitOptions.map((unit) => <option key={unit} value={unit}>{unit}</option>)}
+                  </select>
+                </label>
+                <label>
+                  Sang
+                  <select value={converter.toUnit} onChange={(event) => updateConverter('toUnit', event.target.value)}>
+                    {unitOptions.map((unit) => <option key={unit} value={unit}>{unit}</option>)}
+                  </select>
+                </label>
+              </div>
+              <div className="conversion-result">
+                {converter.quantity || 0} {converter.fromUnit} = <strong>{conversionResult}</strong>
               </div>
             </section>
           </div>
