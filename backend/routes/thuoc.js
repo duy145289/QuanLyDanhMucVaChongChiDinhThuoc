@@ -5,9 +5,11 @@ const { verifyToken, checkRole } = require('../middleware/auth');
 
 // Lấy danh sách thuốc
 router.get('/', async (req, res) => {
+  const showAll = req.query.all === 'true';
   try {
     const pool = await poolPromise;
-    const result = await pool.request().query('SELECT * FROM Thuoc');
+    const queryStr = showAll ? 'SELECT * FROM Thuoc' : 'SELECT * FROM Thuoc WHERE trangThai = 1';
+    const result = await pool.request().query(queryStr);
     res.json(result.recordset);
   } catch (error) {
     console.error(error);
@@ -18,11 +20,15 @@ router.get('/', async (req, res) => {
 // Tìm kiếm thuốc theo từ khóa
 router.get('/search', async (req, res) => {
   const keyword = req.query.q || '';
+  const showAll = req.query.all === 'true';
   try {
     const pool = await poolPromise;
+    const queryStr = showAll 
+        ? 'SELECT * FROM Thuoc WHERE tenThuongMai LIKE @keyword OR maATC LIKE @keyword'
+        : 'SELECT * FROM Thuoc WHERE (tenThuongMai LIKE @keyword OR maATC LIKE @keyword) AND trangThai = 1';
     const result = await pool.request()
         .input('keyword', sql.NVarChar(150), `%${keyword}%`)
-        .query('SELECT * FROM Thuoc WHERE tenThuongMai LIKE @keyword OR maATC LIKE @keyword');
+        .query(queryStr);
     res.json(result.recordset);
   } catch (error) {
     console.error(error);
@@ -46,10 +52,11 @@ router.post('/', verifyToken, checkRole(['Admin', 'BacSi']), async (req, res) =>
       .input('tonToiThieu', sql.Int, tonToiThieu || 0)
       .input('ngaySanXuat', sql.Date, ngaySanXuat || null)
       .input('ngayHetHan', sql.Date, ngayHetHan)
+      .input('trangThai', sql.Int, 1) // Mặc định trạng thái là 1 (Còn hạn)
       .query(`
-        INSERT INTO Thuoc (maATC, tenThuongMai, hoatChat, hamLuong, donViTinh, tonKhoHienTai, tonToiThieu, ngaySanXuat, ngayHetHan) 
+        INSERT INTO Thuoc (maATC, tenThuongMai, hoatChat, hamLuong, donViTinh, tonKhoHienTai, tonToiThieu, ngaySanXuat, ngayHetHan, trangThai) 
         OUTPUT INSERTED.thuocID
-        VALUES (@maATC, @tenThuongMai, @hoatChat, @hamLuong, @donViTinh, @tonKhoHienTai, @tonToiThieu, @ngaySanXuat, @ngayHetHan)
+        VALUES (@maATC, @tenThuongMai, @hoatChat, @hamLuong, @donViTinh, @tonKhoHienTai, @tonToiThieu, @ngaySanXuat, @ngayHetHan, @trangThai)
       `);
     
     res.status(201).json({ id: result.recordset[0].thuocID, message: 'Thêm thuốc thành công' });

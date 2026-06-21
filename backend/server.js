@@ -5,6 +5,9 @@ const dotenv = require('dotenv');
 // Import Middleware
 const auditLog = require('./middleware/auditLog');
 
+// Khởi chạy Cron Jobs
+require('./jobs/checkExpired');
+
 // Import Routes
 const thuocRoutes = require('./routes/thuoc');
 const nguoiDungRoutes = require('./routes/nguoiDung');
