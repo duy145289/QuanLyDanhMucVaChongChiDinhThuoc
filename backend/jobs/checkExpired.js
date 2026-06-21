@@ -13,10 +13,29 @@ cron.schedule('0 0 * * *', async () => {
                 SET trangThai = 0 
                 WHERE ngayHetHan < CAST(GETDATE() AS DATE) AND trangThai = 1
             `);
+        const rowsAffected = result.rowsAffected[0] || 0;
+        console.log(`✅ Job hoàn tất: Đã vô hiệu hóa ${rowsAffected} thuốc đã hết hạn.`);
         
-        console.log(`✅ Job hoàn tất: Đã vô hiệu hóa ${result.rowsAffected[0] || 0} thuốc đã hết hạn.`);
+        // Nâng cấp: Ghi lại hành động này vào Audit Log của hệ thống
+        if (rowsAffected > 0) {
+            await pool.request()
+                .query(`
+                    INSERT INTO AuditLog (userId, hanhDong, chiTiet, thoiGian, ketQua)
+                    VALUES (NULL, 'SYSTEM BACKGROUND JOB', N'Tự động vô hiệu hóa ${rowsAffected} thuốc hết hạn', GETDATE(), N'Thành công')
+                `);
+        }
     } catch (error) {
         console.error('❌ Lỗi khi chạy Job kiểm tra thuốc hết hạn:', error);
+        
+        // Ghi log lỗi nếu cần
+        try {
+            const pool = await poolPromise;
+            await pool.request()
+                .query(`
+                    INSERT INTO AuditLog (userId, hanhDong, chiTiet, thoiGian, ketQua)
+                    VALUES (NULL, 'SYSTEM BACKGROUND JOB', N'Lỗi khi vô hiệu hóa thuốc hết hạn', GETDATE(), N'Thất bại')
+                `);
+        } catch(e) {}
     }
 });
 
