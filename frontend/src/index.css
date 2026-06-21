@@ -216,6 +216,26 @@ body {
 .badge.danger { background-color: #fee2e2; color: #ef4444; }
 .badge.warning { background-color: #fef3c7; color: #f59e0b; }
 .badge.success { background-color: #d1fae5; color: #10b981; }
+.badge.secondary { background-color: #f1f5f9; color: #64748b; }
+
+/* Trạng thái Hết hạn (Bôi xám DataGrid) */
+.expired-row {
+  background-color: #f8fafc;
+  color: #94a3b8;
+}
+
+.expired-row td {
+  text-decoration: line-through;
+  pointer-events: none; /* Vô hiệu hóa click */
+}
+
+.expired-row td:last-child {
+  text-decoration: none; /* Giữ nguyên badge hiển thị rõ ràng */
+}
+
+.expired-row:hover {
+  background-color: #f1f5f9;
+}
 
 .section-title {
   margin-bottom: 15px;

@@ -12,6 +12,7 @@ export default function NhapThongTinBenhNhan() {
 
   const [errors, setErrors] = useState({});
   const [isSuccess, setIsSuccess] = useState(false);
+  const [tuoiHienTai, setTuoiHienTai] = useState(null);
 
   // Xử lý thay đổi input
   const handleChange = (e) => {
@@ -20,6 +21,21 @@ export default function NhapThongTinBenhNhan() {
       ...prev,
       [name]: type === 'checkbox' ? checked : value
     }));
+
+    // Tính tuổi trực tiếp khi chọn ngày sinh
+    if (name === 'ngaySinh' && value) {
+      const birthDate = new Date(value);
+      const today = new Date();
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const m = today.getMonth() - birthDate.getMonth();
+      if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+      }
+      setTuoiHienTai(age);
+    } else if (name === 'ngaySinh' && !value) {
+      setTuoiHienTai(null);
+    }
+
     // Clear lỗi khi người dùng bắt đầu nhập lại
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: null }));
@@ -45,6 +61,8 @@ export default function NhapThongTinBenhNhan() {
       const birthDate = new Date(formData.ngaySinh);
       if (birthDate > today) {
         newErrors.ngaySinh = 'Ngày sinh không thể lớn hơn ngày hiện tại';
+      } else if (tuoiHienTai !== null && tuoiHienTai > 150) {
+        newErrors.ngaySinh = 'Tuổi bệnh nhân không hợp lệ (vượt quá 150 tuổi)';
       }
     }
 
@@ -53,6 +71,11 @@ export default function NhapThongTinBenhNhan() {
       newErrors.canNang = 'Vui lòng nhập cân nặng';
     } else if (parseFloat(formData.canNang) <= 0 || parseFloat(formData.canNang) > 300) {
       newErrors.canNang = 'Cân nặng phải lớn hơn 0 và hợp lý (<= 300kg)';
+    }
+
+    // Validate Tiền sử bệnh
+    if (formData.tienSuBenh.trim().length > 0 && formData.tienSuBenh.trim().length < 10) {
+      newErrors.tienSuBenh = 'Tiền sử bệnh lý nếu có nhập thì phải mô tả chi tiết (tối thiểu 10 ký tự)';
     }
 
     setErrors(newErrors);
@@ -77,6 +100,9 @@ export default function NhapThongTinBenhNhan() {
       console.log('Dữ liệu hợp lệ, Chuẩn bị lưu DB:', {
         ...formData,
         tuoi: age,
+      console.log('Dữ liệu hợp lệ, Chuẩn bị lưu DB:', {
+        ...formData,
+        tuoi: tuoiHienTai,
         canNang: parseFloat(formData.canNang)
       });
       
@@ -143,6 +169,9 @@ export default function NhapThongTinBenhNhan() {
                 />
                 <Calendar className="w-5 h-5 text-gray-400 absolute left-3 top-3" />
               </div>
+              {tuoiHienTai !== null && !errors.ngaySinh && (
+                <p className="text-sm text-green-600 mt-1 font-medium">Đã tính tuổi: {tuoiHienTai} tuổi</p>
+              )}
               {errors.ngaySinh && <p className="text-red-500 text-xs mt-1 flex items-center gap-1"><AlertCircle className="w-3 h-3"/>{errors.ngaySinh}</p>}
             </div>
 
@@ -193,6 +222,14 @@ export default function NhapThongTinBenhNhan() {
                 placeholder="Nhập các bệnh lý nền, dị ứng (nếu có)..."
               ></textarea>
               <p className="text-xs text-gray-500">Thông tin này rất quan trọng để hệ thống Quét chống chỉ định tự động (CCD).</p>
+                className={`w-full p-3 border rounded-lg focus:ring-2 outline-none transition-all ${errors.tienSuBenh ? 'border-red-300 focus:ring-red-200' : 'border-gray-200 focus:ring-blue-100 focus:border-blue-500'}`}
+                placeholder="Nhập các bệnh lý nền, dị ứng (nếu có)..."
+              ></textarea>
+              {errors.tienSuBenh ? (
+                <p className="text-red-500 text-xs mt-1 flex items-center gap-1"><AlertCircle className="w-3 h-3"/>{errors.tienSuBenh}</p>
+              ) : (
+                <p className="text-xs text-gray-500">Thông tin này rất quan trọng để hệ thống Quét chống chỉ định tự động (CCD).</p>
+              )}
             </div>
           </div>
 
@@ -200,6 +237,11 @@ export default function NhapThongTinBenhNhan() {
             <button
               type="button"
               onClick={() => setFormData({ hoTen: '', ngaySinh: '', canNang: '', tienSuBenh: '', isMangThai: false })}
+              onClick={() => {
+                setFormData({ hoTen: '', ngaySinh: '', canNang: '', tienSuBenh: '', isMangThai: false });
+                setTuoiHienTai(null);
+                setErrors({});
+              }}
               className="px-6 py-2.5 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors"
             >
               Làm mới
