@@ -16,6 +16,8 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: '20.x'
+    - name: Remove msnodesqlv8 for CI
+      run: cd backend && npm uninstall msnodesqlv8
     - name: Install backend dependencies
       run: cd backend && npm install
     - name: Run backend tests
