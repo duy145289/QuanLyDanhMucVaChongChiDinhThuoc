@@ -20,6 +20,12 @@ const MEDICINE_UNITS = [
   'lọ'
 ];
 
+const SOLID_UNIT_FACTORS = {
+  'viên': 1,
+  'vỉ': 10,
+  'hộp': 100
+};
+
 function isValidCategory(value) {
   return MEDICINE_CATEGORIES.includes(value);
 }
@@ -31,6 +37,7 @@ function isValidUnit(value) {
 module.exports = {
   MEDICINE_CATEGORIES,
   MEDICINE_UNITS,
+  SOLID_UNIT_FACTORS,
   isValidCategory,
   isValidUnit
 };

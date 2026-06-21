@@ -207,6 +207,24 @@ button {
   font-weight: 700;
 }
 
+.converter-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.converter-grid label:first-child {
+  grid-column: 1 / -1;
+}
+
+.conversion-result {
+  border-radius: 7px;
+  background: var(--panel-strong);
+  color: var(--primary-dark);
+  font-weight: 700;
+  padding: 12px;
+}
+
 .section-heading,
 .table-toolbar {
   display: flex;

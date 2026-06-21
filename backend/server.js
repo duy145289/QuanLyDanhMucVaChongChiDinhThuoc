@@ -4,6 +4,7 @@ const dotenv = require('dotenv');
 const auditLog = require('./middleware/auditLog');
 const thuocRoutes = require('./routes/thuoc');
 const nhomThuocRoutes = require('./routes/nhomThuoc');
+const donViRoutes = require('./routes/donVi');
 
 dotenv.config();
 
@@ -16,6 +17,7 @@ app.use(auditLog);
 
 app.use('/api/thuoc', thuocRoutes);
 app.use('/api/nhom-thuoc', nhomThuocRoutes);
+app.use('/api/don-vi', donViRoutes);
 
 app.get('/api/health', (_req, res) => {
   res.json({
