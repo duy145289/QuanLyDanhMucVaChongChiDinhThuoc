@@ -649,6 +649,15 @@ textarea {
   box-shadow: 0 28px 70px rgba(18, 27, 38, 0.28);
 }
 
+.dose-warning-dialog.absolute-risk {
+  border-color: #f1a7a0;
+  box-shadow: 0 28px 70px rgba(127, 29, 29, 0.28);
+}
+
+.dose-warning-dialog.caution-risk {
+  border-color: #f0c36d;
+}
+
 .warning-dialog-heading {
   display: grid;
   grid-template-columns: auto 1fr auto;
@@ -668,12 +677,22 @@ textarea {
   color: var(--danger);
 }
 
+.dose-warning-dialog.caution-risk .warning-icon {
+  background: var(--warning-bg);
+  color: var(--warning);
+}
+
 .warning-dialog-heading p {
   margin: 0 0 3px;
   color: var(--danger);
   font-size: 12px;
   font-weight: 800;
   text-transform: uppercase;
+}
+
+.dose-warning-dialog.caution-risk .warning-dialog-heading p,
+.dose-warning-dialog.caution-risk .warning-dialog-body dd {
+  color: var(--warning);
 }
 
 .warning-dialog-body {
