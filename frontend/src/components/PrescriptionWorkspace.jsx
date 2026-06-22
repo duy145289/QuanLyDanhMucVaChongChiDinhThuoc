@@ -29,25 +29,34 @@ export default function PrescriptionWorkspace({ medicines, onNavigate }) {
   const [saving, setSaving] = useState(false);
   const [doseWarning, setDoseWarning] = useState(null);
   const [dismissedWarning, setDismissedWarning] = useState('');
+  const [warningOverrides, setWarningOverrides] = useState({});
 
   const medicineById = useMemo(() => (
     medicines.reduce((map, medicine) => ({ ...map, [medicine.thuocID]: medicine }), {})
   ), [medicines]);
 
-  const activeDoseWarning = useMemo(() => {
-    for (const line of lines) {
+  const doseWarnings = useMemo(() => {
+    return lines.reduce((warnings, line) => {
       const dose = calculateLineDose(line);
-      if (dose.vuotLieu) {
-        return {
+      if (!dose.vuotLieu) return warnings;
+
+      return [
+        ...warnings,
+        {
           line,
           dose,
           medicine: medicineById[line.thuocID],
           signature: `${line.localID}:${dose.tongLieuNgay}:${dose.maxLieuNgay}:${dose.mucDoCanhBao}`
-        };
-      }
-    }
-    return null;
+        }
+      ];
+    }, []);
   }, [lines, medicineById]);
+
+  const activeDoseWarning = useMemo(() => {
+    return doseWarnings.find((warning) => (
+      warning.dose.isTuyetDoi || !warningOverrides[warning.signature]
+    )) || null;
+  }, [doseWarnings, warningOverrides]);
 
   useEffect(() => {
     if (activeDoseWarning && activeDoseWarning.signature !== dismissedWarning) {
@@ -76,6 +85,17 @@ export default function PrescriptionWorkspace({ medicines, onNavigate }) {
       : current.filter((line) => line.localID !== localID));
   }
 
+  function overrideDoseWarning(signature, reason) {
+    const normalizedReason = reason.trim();
+    setWarningOverrides((current) => ({
+      ...current,
+      [signature]: normalizedReason
+    }));
+    setDismissedWarning(signature);
+    setDoseWarning(null);
+    setNotice('Đã ghi nhận lý do bỏ qua cảnh báo thận trọng.');
+  }
+
   async function saveDraft() {
     if (!header.tenBenhNhan.trim()) {
       setNotice('Vui lòng nhập tên bệnh nhân trước khi lưu.');
@@ -84,20 +104,28 @@ export default function PrescriptionWorkspace({ medicines, onNavigate }) {
 
     if (activeDoseWarning) {
       setDoseWarning(activeDoseWarning);
-      setNotice('Không thể lưu khi đơn thuốc còn dòng vượt liều.');
+      setNotice(activeDoseWarning.dose.isTuyetDoi
+        ? 'Không thể lưu khi đơn thuốc còn rủi ro Tuyệt đối.'
+        : 'Vui lòng nhập lý do bỏ qua cảnh báo Thận trọng trước khi lưu.');
       return;
     }
 
     setSaving(true);
     try {
-      const chiTiet = lines.map(({ localID: _localID, ...line }) => ({
-        ...line,
-        thuocID: Number(line.thuocID),
-        lieuMoiLan: Number(line.lieuMoiLan),
-        soLanNgay: Number(line.soLanNgay),
-        soNgay: Number(line.soNgay),
-        soLuong: Number(line.soLuong)
-      }));
+      const chiTiet = lines.map(({ localID, ...line }) => {
+        const dose = calculateLineDose(line);
+        const signature = `${localID}:${dose.tongLieuNgay}:${dose.maxLieuNgay}:${dose.mucDoCanhBao}`;
+
+        return {
+          ...line,
+          thuocID: Number(line.thuocID),
+          lieuMoiLan: Number(line.lieuMoiLan),
+          soLanNgay: Number(line.soLanNgay),
+          soNgay: Number(line.soNgay),
+          soLuong: Number(line.soLuong),
+          lyDoOverrideCanhBao: warningOverrides[signature] || ''
+        };
+      });
       const response = await fetch('/api/don-thuoc', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -239,6 +267,7 @@ export default function PrescriptionWorkspace({ medicines, onNavigate }) {
       </section>
       <DoseWarningDialog
         warning={doseWarning}
+        onOverride={overrideDoseWarning}
         onClose={() => {
           setDismissedWarning(doseWarning?.signature || '');
           setDoseWarning(null);
