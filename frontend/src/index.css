@@ -478,6 +478,98 @@ select:focus {
   font-size: 12px;
 }
 
+.dialog-backdrop {
+  position: fixed;
+  z-index: 100;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(13, 27, 42, 0.52);
+}
+
+.dose-warning-dialog {
+  width: min(480px, 100%);
+  border: 1px solid #f1b8b4;
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 28px 70px rgba(18, 27, 38, 0.28);
+}
+
+.warning-dialog-heading {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: start;
+  gap: 12px;
+  padding: 18px;
+  border-bottom: 1px solid var(--border);
+}
+
+.warning-icon {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #fff0ef;
+  color: var(--danger);
+}
+
+.warning-dialog-heading p {
+  margin: 0 0 3px;
+  color: var(--danger);
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.warning-dialog-body {
+  padding: 18px;
+}
+
+.warning-dialog-body > strong {
+  display: block;
+  margin-bottom: 14px;
+  font-size: 17px;
+}
+
+.warning-dialog-body dl {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin: 0;
+}
+
+.warning-dialog-body dl div {
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+}
+
+.warning-dialog-body dt {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.warning-dialog-body dd {
+  margin: 4px 0 0;
+  color: var(--danger);
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.warning-dialog-body p {
+  margin: 16px 0 0;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.warning-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  padding: 14px 18px 18px;
+}
+
 .autocomplete-list p {
   margin: 0;
   padding: 14px;
