@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import PrescriptionWorkspace from './components/PrescriptionWorkspace.jsx';
+import ContraindicationRules from './components/ContraindicationRules.jsx';
 
 const categoryOptions = ['Kháng sinh', 'Giảm đau - hạ sốt', 'Tim mạch', 'Tiêu hóa', 'Hô hấp', 'Dị ứng', 'Vitamin - khoáng chất', 'Khác'];
 const unitOptions = ['viên', 'vỉ', 'hộp', 'chai', 'ống', 'gói', 'tuýp', 'lọ'];
@@ -272,6 +273,10 @@ function App() {
     return <PrescriptionWorkspace medicines={medicines} onNavigate={setActiveView} />;
   }
 
+  if (activeView === 'rules') {
+    return <ContraindicationRules medicines={medicines} onNavigate={setActiveView} />;
+  }
+
   return (
     <main className="app-shell">
       <aside className="sidebar">
@@ -280,6 +285,7 @@ function App() {
         <nav aria-label="Điều hướng chính">
           <button className="nav-button active" type="button">Danh mục thuốc</button>
           <button className="nav-button" type="button" onClick={() => setActiveView('prescription')}>Đơn thuốc</button>
+          <button className="nav-button" type="button" onClick={() => setActiveView('rules')}>Chống chỉ định</button>
           <button className="nav-button" type="button">Nhóm thuốc</button>
           <button className="nav-button" type="button">Kho thuốc</button>
         </nav>
