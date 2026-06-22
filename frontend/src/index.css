@@ -368,7 +368,7 @@ select:focus {
 }
 
 .prescription-table {
-  min-width: 1040px;
+  min-width: 1260px;
 }
 
 .prescription-table th:nth-child(1) {
@@ -378,7 +378,9 @@ select:focus {
 .prescription-table th:nth-child(2),
 .prescription-table th:nth-child(3),
 .prescription-table th:nth-child(4),
-.prescription-table th:nth-child(5) {
+.prescription-table th:nth-child(5),
+.prescription-table th:nth-child(6),
+.prescription-table th:nth-child(7) {
   width: 112px;
 }
 
@@ -400,6 +402,27 @@ select:focus {
   min-height: 18px;
   margin-top: 5px;
   color: var(--muted);
+}
+
+.generated-dose-cell {
+  min-width: 112px;
+  background: #f4f8fb;
+}
+
+.generated-dose-cell strong,
+.generated-dose-cell small {
+  display: block;
+}
+
+.generated-dose-cell strong {
+  color: var(--primary-dark);
+  font-size: 16px;
+}
+
+.generated-dose-cell small {
+  margin-top: 3px;
+  color: var(--muted);
+  white-space: nowrap;
 }
 
 .medicine-autocomplete {
