@@ -39,6 +39,14 @@ router.post('/draft', verifyToken, checkRole(['Admin', 'BacSi']), async (req, re
   }
 });
 
+router.post('/dose-check', verifyToken, checkRole(['Admin', 'BacSi', 'DuocSi']), (req, res) => {
+  try {
+    return res.json(donThuocService.checkDose(req.body));
+  } catch (error) {
+    return handleRouteError(res, error);
+  }
+});
+
 router.post('/', verifyToken, checkRole(['Admin', 'BacSi']), async (req, res) => {
   try {
     const prescription = await donThuocService.createPrescription(req.body, req.user);
