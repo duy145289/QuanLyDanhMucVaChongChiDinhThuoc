@@ -54,8 +54,56 @@ async function createDraft(data) {
   return { ...result.recordset[0], chiTiet: [] };
 }
 
+async function createPrescription(data) {
+  const pool = await poolPromise;
+  const transaction = new sql.Transaction(pool);
+  await transaction.begin();
+
+  try {
+    const headerResult = await new sql.Request(transaction)
+      .input('maDonThuoc', sql.VarChar(30), data.maDonThuoc)
+      .input('tenBenhNhan', sql.NVarChar(150), data.tenBenhNhan)
+      .input('ngayKeDon', sql.Date, data.ngayKeDon)
+      .input('ghiChu', sql.NVarChar(500), data.ghiChu)
+      .input('createdBy', sql.NVarChar(120), data.createdBy)
+      .query(`
+        INSERT INTO DonThuoc (maDonThuoc, tenBenhNhan, ngayKeDon, ghiChu, trangThai, createdBy)
+        OUTPUT INSERTED.*
+        VALUES (@maDonThuoc, @tenBenhNhan, @ngayKeDon, @ghiChu, N'Đã lưu', @createdBy)
+      `);
+
+    const header = headerResult.recordset[0];
+    for (const item of data.chiTiet) {
+      await new sql.Request(transaction)
+        .input('donThuocID', sql.Int, header.donThuocID)
+        .input('thuocID', sql.Int, item.thuocID)
+        .input('lieuMoiLan', sql.Decimal(10, 2), item.lieuMoiLan)
+        .input('soLanNgay', sql.Int, item.soLanNgay)
+        .input('soNgay', sql.Int, item.soNgay)
+        .input('soLuong', sql.Int, item.soLuong)
+        .input('huongDan', sql.NVarChar(255), item.huongDan)
+        .input('maxLieuNgay', sql.Decimal(10, 2), item.maxLieuNgay)
+        .query(`
+          INSERT INTO ChiTietDonThuoc (
+            donThuocID, thuocID, lieuMoiLan, soLanNgay, soNgay, soLuong, huongDan, maxLieuNgay
+          )
+          VALUES (
+            @donThuocID, @thuocID, @lieuMoiLan, @soLanNgay, @soNgay, @soLuong, @huongDan, @maxLieuNgay
+          )
+        `);
+    }
+
+    await transaction.commit();
+    return findById(header.donThuocID);
+  } catch (error) {
+    await transaction.rollback();
+    throw error;
+  }
+}
+
 module.exports = {
   findAll,
   findById,
-  createDraft
+  createDraft,
+  createPrescription
 };

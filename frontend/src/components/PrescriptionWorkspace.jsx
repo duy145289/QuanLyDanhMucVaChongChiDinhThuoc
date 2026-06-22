@@ -56,14 +56,22 @@ export default function PrescriptionWorkspace({ medicines, onNavigate }) {
 
     setSaving(true);
     try {
-      const response = await fetch('/api/don-thuoc/draft', {
+      const chiTiet = lines.map(({ localID: _localID, ...line }) => ({
+        ...line,
+        thuocID: Number(line.thuocID),
+        lieuMoiLan: Number(line.lieuMoiLan),
+        soLanNgay: Number(line.soLanNgay),
+        soNgay: Number(line.soNgay),
+        soLuong: Number(line.soLuong)
+      }));
+      const response = await fetch('/api/don-thuoc', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(header)
+        body: JSON.stringify({ ...header, chiTiet })
       });
       if (!response.ok) throw new Error('Save failed');
       const saved = await response.json();
-      setNotice(`Đã lưu bản nháp ${saved.maDonThuoc}.`);
+      setNotice(`Đã lưu đơn thuốc ${saved.maDonThuoc} với ${saved.chiTiet.length} dòng thuốc.`);
     } catch (_error) {
       setNotice('Backend chưa sẵn sàng; dữ liệu vẫn được giữ trên màn hình.');
     } finally {
@@ -98,7 +106,7 @@ export default function PrescriptionWorkspace({ medicines, onNavigate }) {
           <div className="toolbar-actions">
             <span className="sync-state">{notice}</span>
             <button className="primary-button icon-text-button" type="button" onClick={saveDraft} disabled={saving}>
-              <Save size={17} /> {saving ? 'Đang lưu' : 'Lưu bản nháp'}
+              <Save size={17} /> {saving ? 'Đang lưu' : 'Lưu đơn thuốc'}
             </button>
           </div>
         </header>
