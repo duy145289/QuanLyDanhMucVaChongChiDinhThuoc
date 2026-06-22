@@ -1,3 +1,10 @@
+function auditLog(req, _res, next) {
+  if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method)) {
+    console.log(`[AUDIT] ${new Date().toISOString()} ${req.method} ${req.originalUrl}`);
+  }
+
+  next();
+}
 const { poolPromise, sql } = require('../db');
 
 const auditLog = async (req, res, next) => {

@@ -1,6 +1,10 @@
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const auditLog = require('./middleware/auditLog');
+const thuocRoutes = require('./routes/thuoc');
+const nhomThuocRoutes = require('./routes/nhomThuoc');
+const donViRoutes = require('./routes/donVi');
 
 // Import Middleware
 const auditLog = require('./middleware/auditLog');
@@ -20,6 +24,17 @@ const PORT = process.env.PORT || 5000;
 
 app.use(cors());
 app.use(express.json());
+app.use(auditLog);
+
+app.use('/api/thuoc', thuocRoutes);
+app.use('/api/nhom-thuoc', nhomThuocRoutes);
+app.use('/api/don-vi', donViRoutes);
+
+app.get('/api/health', (_req, res) => {
+  res.json({
+    status: 'ok',
+    message: 'Backend Quan Ly Danh Muc Va Chong Chi Dinh Thuoc dang hoat dong'
+  });
 
 // Gắn Global Middleware: Bắt buộc mọi request thay đổi dữ liệu đều bị lưu lại Audit Log
 app.use(auditLog);
