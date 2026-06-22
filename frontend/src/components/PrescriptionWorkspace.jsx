@@ -1,6 +1,7 @@
 import { ClipboardList, PackageOpen, Pill, Plus, Save, Trash2 } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import MedicineAutocomplete from './MedicineAutocomplete.jsx';
+import { calculateLineDose } from '../utils/dose.js';
 
 function createLine(medicine) {
   return {
@@ -10,6 +11,7 @@ function createLine(medicine) {
     soLanNgay: 1,
     soNgay: 1,
     soLuong: 1,
+    maxLieuNgay: '',
     huongDan: ''
   };
 }
@@ -149,6 +151,8 @@ export default function PrescriptionWorkspace({ medicines, onNavigate }) {
                   <th>Liều/lần</th>
                   <th>Lần/ngày</th>
                   <th>Số ngày</th>
+                  <th>Giới hạn/ngày</th>
+                  <th>Tổng liều</th>
                   <th>Số lượng</th>
                   <th>Hướng dẫn</th>
                   <th aria-label="Xóa dòng" />
@@ -157,6 +161,7 @@ export default function PrescriptionWorkspace({ medicines, onNavigate }) {
               <tbody>
                 {lines.map((line) => {
                   const medicine = medicineById[line.thuocID];
+                  const dose = calculateLineDose(line);
                   return (
                     <tr key={line.localID}>
                       <td className="medicine-select-cell">
@@ -170,6 +175,11 @@ export default function PrescriptionWorkspace({ medicines, onNavigate }) {
                       <td><input type="number" min="0.01" step="0.01" value={line.lieuMoiLan} onChange={(event) => updateLine(line.localID, 'lieuMoiLan', event.target.value)} /></td>
                       <td><input type="number" min="1" value={line.soLanNgay} onChange={(event) => updateLine(line.localID, 'soLanNgay', event.target.value)} /></td>
                       <td><input type="number" min="1" value={line.soNgay} onChange={(event) => updateLine(line.localID, 'soNgay', event.target.value)} /></td>
+                      <td><input type="number" min="0.01" step="0.01" value={line.maxLieuNgay} onChange={(event) => updateLine(line.localID, 'maxLieuNgay', event.target.value)} placeholder="Chưa đặt" /></td>
+                      <td className="generated-dose-cell">
+                        <strong>{dose.tongLieuNgay}</strong>
+                        <small>{dose.tongLieuDot} toàn đợt</small>
+                      </td>
                       <td><input type="number" min="1" value={line.soLuong} onChange={(event) => updateLine(line.localID, 'soLuong', event.target.value)} /></td>
                       <td><input value={line.huongDan} onChange={(event) => updateLine(line.localID, 'huongDan', event.target.value)} placeholder="Sau ăn" /></td>
                       <td>
