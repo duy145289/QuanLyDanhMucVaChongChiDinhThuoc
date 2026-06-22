@@ -52,6 +52,11 @@ export default function PrescriptionWorkspace({ medicines, onNavigate }) {
     }, []);
   }, [lines, medicineById]);
 
+  const absoluteDoseWarning = useMemo(
+    () => doseWarnings.find((warning) => warning.dose.isTuyetDoi) || null,
+    [doseWarnings]
+  );
+
   const activeDoseWarning = useMemo(() => {
     return doseWarnings.find((warning) => (
       warning.dose.isTuyetDoi || !warningOverrides[warning.signature]
@@ -170,7 +175,13 @@ export default function PrescriptionWorkspace({ medicines, onNavigate }) {
           </div>
           <div className="toolbar-actions">
             <span className="sync-state">{notice}</span>
-            <button className="primary-button icon-text-button" type="button" onClick={saveDraft} disabled={saving}>
+            <button
+              className="primary-button icon-text-button"
+              type="button"
+              onClick={saveDraft}
+              disabled={saving || Boolean(absoluteDoseWarning)}
+              title={absoluteDoseWarning ? 'Không thể lưu khi còn rủi ro Tuyệt đối' : 'Lưu đơn thuốc'}
+            >
               <Save size={17} /> {saving ? 'Đang lưu' : 'Lưu đơn thuốc'}
             </button>
           </div>
