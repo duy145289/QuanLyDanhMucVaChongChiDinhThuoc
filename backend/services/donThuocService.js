@@ -31,6 +31,37 @@ function throwValidationError(errors) {
   throw error;
 }
 
+function normalizeDetail(item) {
+  return {
+    thuocID: Number.parseInt(item.thuocID, 10),
+    lieuMoiLan: Number(item.lieuMoiLan),
+    soLanNgay: Number.parseInt(item.soLanNgay, 10),
+    soNgay: Number.parseInt(item.soNgay, 10),
+    soLuong: Number.parseInt(item.soLuong, 10),
+    huongDan: item.huongDan?.trim() || null,
+    maxLieuNgay: item.maxLieuNgay === '' || item.maxLieuNgay == null ? null : Number(item.maxLieuNgay)
+  };
+}
+
+function validateDetails(items) {
+  const errors = [];
+  if (!items.length) errors.push('Don thuoc phai co it nhat mot thuoc');
+
+  const medicineIDs = new Set();
+  items.forEach((item, index) => {
+    const label = `Dong ${index + 1}`;
+    if (!Number.isInteger(item.thuocID) || item.thuocID <= 0) errors.push(`${label}: thuoc khong hop le`);
+    if (!Number.isFinite(item.lieuMoiLan) || item.lieuMoiLan <= 0) errors.push(`${label}: lieu moi lan phai lon hon 0`);
+    if (!Number.isInteger(item.soLanNgay) || item.soLanNgay <= 0) errors.push(`${label}: so lan ngay phai lon hon 0`);
+    if (!Number.isInteger(item.soNgay) || item.soNgay <= 0) errors.push(`${label}: so ngay phai lon hon 0`);
+    if (!Number.isInteger(item.soLuong) || item.soLuong <= 0) errors.push(`${label}: so luong phai lon hon 0`);
+    if (medicineIDs.has(item.thuocID)) errors.push(`${label}: thuoc bi trung trong don`);
+    medicineIDs.add(item.thuocID);
+  });
+
+  return errors;
+}
+
 async function listDonThuoc() {
   return donThuocRepository.findAll();
 }
@@ -46,10 +77,19 @@ async function createDraft(payload, user) {
   return donThuocRepository.createDraft(data);
 }
 
+async function createPrescription(payload, user) {
+  const header = normalizeHeader(payload, user);
+  const chiTiet = Array.isArray(payload.chiTiet) ? payload.chiTiet.map(normalizeDetail) : [];
+  const errors = [...validateHeader(header), ...validateDetails(chiTiet)];
+  if (errors.length) throwValidationError(errors);
+  return donThuocRepository.createPrescription({ ...header, chiTiet });
+}
+
 module.exports = {
   listDonThuoc,
   getDonThuoc,
   createDraft,
+  createPrescription,
   normalizeHeader,
   validateHeader,
   throwValidationError

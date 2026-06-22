@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import PrescriptionWorkspace from './components/PrescriptionWorkspace.jsx';
 
 const categoryOptions = ['Kháng sinh', 'Giảm đau - hạ sốt', 'Tim mạch', 'Tiêu hóa', 'Hô hấp', 'Dị ứng', 'Vitamin - khoáng chất', 'Khác'];
 const unitOptions = ['viên', 'vỉ', 'hộp', 'chai', 'ống', 'gói', 'tuýp', 'lọ'];
@@ -82,6 +83,7 @@ function stockStatus(medicine) {
 }
 
 function App() {
+  const [activeView, setActiveView] = useState('catalog');
   const [medicines, setMedicines] = useState(sampleMedicines);
   const [groups, setGroups] = useState(sampleGroups);
   const [newGroupName, setNewGroupName] = useState('');
@@ -266,6 +268,10 @@ function App() {
   const lowStockCount = medicines.filter((item) => Number(item.tonKhoHienTai) <= Number(item.tonToiThieu)).length;
   const categoryCount = new Set(medicines.map((item) => item.phanLoai || 'Khác')).size;
 
+  if (activeView === 'prescription') {
+    return <PrescriptionWorkspace medicines={medicines} onNavigate={setActiveView} />;
+  }
+
   return (
     <main className="app-shell">
       <aside className="sidebar">
@@ -273,6 +279,7 @@ function App() {
         <h1>QLDM CCDT</h1>
         <nav aria-label="Điều hướng chính">
           <button className="nav-button active" type="button">Danh mục thuốc</button>
+          <button className="nav-button" type="button" onClick={() => setActiveView('prescription')}>Đơn thuốc</button>
           <button className="nav-button" type="button">Nhóm thuốc</button>
           <button className="nav-button" type="button">Kho thuốc</button>
         </nav>

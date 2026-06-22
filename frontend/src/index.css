@@ -83,6 +83,12 @@ button {
   gap: 8px;
 }
 
+.sidebar .nav-button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .nav-button {
   width: 100%;
   border: 0;
@@ -311,6 +317,162 @@ select:focus {
   color: var(--primary-dark);
 }
 
+.icon-text-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.icon-button {
+  width: 36px;
+  height: 36px;
+  display: inline-grid;
+  place-items: center;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  background: #ffffff;
+}
+
+.toolbar-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 14px;
+}
+
+.prescription-workspace {
+  display: grid;
+  align-content: start;
+  gap: 18px;
+}
+
+.prescription-workspace .topbar {
+  margin-bottom: 0;
+}
+
+.prescription-header {
+  display: grid;
+  grid-template-columns: minmax(240px, 1.2fr) minmax(170px, 0.5fr) minmax(280px, 1.4fr);
+  gap: 14px;
+  padding: 18px;
+  border-block: 1px solid var(--border);
+  background: #ffffff;
+}
+
+.prescription-panel {
+  min-width: 0;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 16px 35px rgba(31, 45, 61, 0.06);
+}
+
+.prescription-table-heading {
+  padding: 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.prescription-table-heading p {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.prescription-table {
+  min-width: 1040px;
+}
+
+.prescription-table th:nth-child(1) {
+  width: 280px;
+}
+
+.prescription-table th:nth-child(2),
+.prescription-table th:nth-child(3),
+.prescription-table th:nth-child(4),
+.prescription-table th:nth-child(5) {
+  width: 112px;
+}
+
+.prescription-table th:last-child {
+  width: 56px;
+}
+
+.prescription-table td {
+  padding: 10px;
+}
+
+.prescription-table input,
+.prescription-table select {
+  min-height: 40px;
+}
+
+.medicine-select-cell small {
+  display: block;
+  min-height: 18px;
+  margin-top: 5px;
+  color: var(--muted);
+}
+
+.medicine-autocomplete {
+  position: relative;
+}
+
+.medicine-autocomplete > svg {
+  position: absolute;
+  z-index: 1;
+  left: 11px;
+  top: 12px;
+  color: var(--muted);
+  pointer-events: none;
+}
+
+.medicine-autocomplete > input {
+  padding-left: 35px;
+}
+
+.autocomplete-list {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 5px);
+  left: 0;
+  width: min(420px, 78vw);
+  max-height: 260px;
+  overflow: auto;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  background: #ffffff;
+  box-shadow: 0 18px 45px rgba(21, 34, 50, 0.18);
+}
+
+.autocomplete-list button {
+  width: 100%;
+  display: grid;
+  gap: 3px;
+  padding: 10px 12px;
+  border: 0;
+  border-bottom: 1px solid var(--border);
+  background: #ffffff;
+  text-align: left;
+}
+
+.autocomplete-list button:hover,
+.autocomplete-list button:focus {
+  background: var(--panel-strong);
+}
+
+.autocomplete-list span,
+.autocomplete-list p {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.autocomplete-list p {
+  margin: 0;
+  padding: 14px;
+}
+
 .table-panel {
   min-width: 0;
 }
@@ -416,6 +578,20 @@ td small {
 
   .sync-state {
     text-align: left;
+  }
+
+  .toolbar-actions,
+  .prescription-header {
+    width: 100%;
+  }
+
+  .toolbar-actions {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .prescription-header {
+    grid-template-columns: 1fr;
   }
   margin: 0;
   padding: 0;
