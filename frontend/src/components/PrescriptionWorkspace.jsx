@@ -1,7 +1,8 @@
 import { ClipboardList, PackageOpen, Pill, Plus, Save, Trash2 } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import MedicineAutocomplete from './MedicineAutocomplete.jsx';
 import { calculateLineDose } from '../utils/dose.js';
+import DoseWarningDialog from './DoseWarningDialog.jsx';
 
 function createLine(medicine) {
   return {
@@ -25,10 +26,34 @@ export default function PrescriptionWorkspace({ medicines, onNavigate }) {
   const [lines, setLines] = useState(() => [createLine(medicines[0])]);
   const [notice, setNotice] = useState('Đơn thuốc mới chưa được lưu.');
   const [saving, setSaving] = useState(false);
+  const [doseWarning, setDoseWarning] = useState(null);
+  const [dismissedWarning, setDismissedWarning] = useState('');
 
   const medicineById = useMemo(() => (
     medicines.reduce((map, medicine) => ({ ...map, [medicine.thuocID]: medicine }), {})
   ), [medicines]);
+
+  const activeDoseWarning = useMemo(() => {
+    for (const line of lines) {
+      const dose = calculateLineDose(line);
+      if (dose.vuotLieu) {
+        return {
+          line,
+          dose,
+          medicine: medicineById[line.thuocID],
+          signature: `${line.localID}:${dose.tongLieuNgay}:${dose.maxLieuNgay}`
+        };
+      }
+    }
+    return null;
+  }, [lines, medicineById]);
+
+  useEffect(() => {
+    if (activeDoseWarning && activeDoseWarning.signature !== dismissedWarning) {
+      setDoseWarning(activeDoseWarning);
+    }
+    if (!activeDoseWarning) setDoseWarning(null);
+  }, [activeDoseWarning, dismissedWarning]);
 
   function updateHeader(field, value) {
     setHeader((current) => ({ ...current, [field]: value }));
@@ -53,6 +78,12 @@ export default function PrescriptionWorkspace({ medicines, onNavigate }) {
   async function saveDraft() {
     if (!header.tenBenhNhan.trim()) {
       setNotice('Vui lòng nhập tên bệnh nhân trước khi lưu.');
+      return;
+    }
+
+    if (activeDoseWarning) {
+      setDoseWarning(activeDoseWarning);
+      setNotice('Không thể lưu khi đơn thuốc còn dòng vượt liều.');
       return;
     }
 
@@ -195,6 +226,13 @@ export default function PrescriptionWorkspace({ medicines, onNavigate }) {
           </div>
         </section>
       </section>
+      <DoseWarningDialog
+        warning={doseWarning}
+        onClose={() => {
+          setDismissedWarning(doseWarning?.signature || '');
+          setDoseWarning(null);
+        }}
+      />
     </main>
   );
 }
