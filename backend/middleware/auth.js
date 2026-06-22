@@ -5,7 +5,7 @@ function verifyToken(req, res, next) {
   const token = header.startsWith('Bearer ') ? header.slice(7) : null;
 
   if (!token) {
-    req.user = { role: 'Admin', demoMode: true };
+    req.user = { role: 'Admin', vaiTro: 'Admin', demoMode: true };
     return next();
   }
 
@@ -19,7 +19,9 @@ function verifyToken(req, res, next) {
 
 function checkRole(roles) {
   return (req, res, next) => {
-    if (!req.user || !roles.includes(req.user.role)) {
+    const role = req.user?.role || req.user?.vaiTro;
+
+    if (!role || !roles.includes(role)) {
       return res.status(403).json({ message: 'Ban khong co quyen thuc hien thao tac nay' });
     }
 
