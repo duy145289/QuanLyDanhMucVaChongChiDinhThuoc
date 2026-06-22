@@ -5,6 +5,7 @@ const auditLog = require('./middleware/auditLog');
 const thuocRoutes = require('./routes/thuoc');
 const nhomThuocRoutes = require('./routes/nhomThuoc');
 const donViRoutes = require('./routes/donVi');
+const donThuocRoutes = require('./routes/donThuoc');
 
 // Import Middleware
 const auditLog = require('./middleware/auditLog');
@@ -29,6 +30,7 @@ app.use(auditLog);
 app.use('/api/thuoc', thuocRoutes);
 app.use('/api/nhom-thuoc', nhomThuocRoutes);
 app.use('/api/don-vi', donViRoutes);
+app.use('/api/don-thuoc', donThuocRoutes);
 
 app.get('/api/health', (_req, res) => {
   res.json({
