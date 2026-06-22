@@ -63,6 +63,21 @@ export default function PrescriptionWorkspace({ medicines, onNavigate }) {
     )) || null;
   }, [doseWarnings, warningOverrides]);
 
+  const activeDoseWarning = useMemo(() => {
+    for (const line of lines) {
+      const dose = calculateLineDose(line);
+      if (dose.vuotLieu) {
+        return {
+          line,
+          dose,
+          medicine: medicineById[line.thuocID],
+          signature: `${line.localID}:${dose.tongLieuNgay}:${dose.maxLieuNgay}`
+        };
+      }
+    }
+    return null;
+  }, [lines, medicineById]);
+
   useEffect(() => {
     if (activeDoseWarning && activeDoseWarning.signature !== dismissedWarning) {
       setDoseWarning(activeDoseWarning);
@@ -112,6 +127,7 @@ export default function PrescriptionWorkspace({ medicines, onNavigate }) {
       setNotice(activeDoseWarning.dose.isTuyetDoi
         ? 'Không thể lưu khi đơn thuốc còn rủi ro Tuyệt đối.'
         : 'Vui lòng nhập lý do bỏ qua cảnh báo Thận trọng trước khi lưu.');
+      setNotice('Không thể lưu khi đơn thuốc còn dòng vượt liều.');
       return;
     }
 
@@ -131,6 +147,14 @@ export default function PrescriptionWorkspace({ medicines, onNavigate }) {
           lyDoOverrideCanhBao: warningOverrides[signature] || ''
         };
       });
+      const chiTiet = lines.map(({ localID: _localID, ...line }) => ({
+        ...line,
+        thuocID: Number(line.thuocID),
+        lieuMoiLan: Number(line.lieuMoiLan),
+        soLanNgay: Number(line.soLanNgay),
+        soNgay: Number(line.soNgay),
+        soLuong: Number(line.soLuong)
+      }));
       const response = await fetch('/api/don-thuoc', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -182,6 +206,7 @@ export default function PrescriptionWorkspace({ medicines, onNavigate }) {
               disabled={saving || Boolean(absoluteDoseWarning)}
               title={absoluteDoseWarning ? 'Không thể lưu khi còn rủi ro Tuyệt đối' : 'Lưu đơn thuốc'}
             >
+            <button className="primary-button icon-text-button" type="button" onClick={saveDraft} disabled={saving}>
               <Save size={17} /> {saving ? 'Đang lưu' : 'Lưu đơn thuốc'}
             </button>
           </div>
