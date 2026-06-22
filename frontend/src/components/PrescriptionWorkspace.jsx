@@ -1,5 +1,6 @@
 import { ClipboardList, PackageOpen, Pill, Plus, Save, Trash2 } from 'lucide-react';
 import { useMemo, useState } from 'react';
+import MedicineAutocomplete from './MedicineAutocomplete.jsx';
 
 function createLine(medicine) {
   return {
@@ -151,11 +152,11 @@ export default function PrescriptionWorkspace({ medicines, onNavigate }) {
                   return (
                     <tr key={line.localID}>
                       <td className="medicine-select-cell">
-                        <select value={line.thuocID} onChange={(event) => updateLine(line.localID, 'thuocID', Number(event.target.value))}>
-                          {medicines.map((item) => (
-                            <option key={item.thuocID} value={item.thuocID}>{item.maATC} - {item.tenThuongMai}</option>
-                          ))}
-                        </select>
+                        <MedicineAutocomplete
+                          medicines={medicines}
+                          value={line.thuocID}
+                          onSelect={(selectedMedicine) => updateLine(line.localID, 'thuocID', selectedMedicine.thuocID)}
+                        />
                         <small>{medicine?.hoatChat} · {medicine?.hamLuong}</small>
                       </td>
                       <td><input type="number" min="0.01" step="0.01" value={line.lieuMoiLan} onChange={(event) => updateLine(line.localID, 'lieuMoiLan', event.target.value)} /></td>
