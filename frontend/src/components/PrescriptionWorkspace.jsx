@@ -13,6 +13,7 @@ function createLine(medicine) {
     soNgay: 1,
     soLuong: 1,
     maxLieuNgay: '',
+    mucDoCanhBao: 'TUYET_DOI',
     huongDan: ''
   };
 }
@@ -41,7 +42,7 @@ export default function PrescriptionWorkspace({ medicines, onNavigate }) {
           line,
           dose,
           medicine: medicineById[line.thuocID],
-          signature: `${line.localID}:${dose.tongLieuNgay}:${dose.maxLieuNgay}`
+          signature: `${line.localID}:${dose.tongLieuNgay}:${dose.maxLieuNgay}:${dose.mucDoCanhBao}`
         };
       }
     }
@@ -186,6 +187,7 @@ export default function PrescriptionWorkspace({ medicines, onNavigate }) {
                   <th>Lần/ngày</th>
                   <th>Số ngày</th>
                   <th>Giới hạn/ngày</th>
+                  <th>Mức cảnh báo</th>
                   <th>Tổng liều</th>
                   <th>Số lượng</th>
                   <th>Hướng dẫn</th>
@@ -210,6 +212,12 @@ export default function PrescriptionWorkspace({ medicines, onNavigate }) {
                       <td><input type="number" min="1" value={line.soLanNgay} onChange={(event) => updateLine(line.localID, 'soLanNgay', event.target.value)} /></td>
                       <td><input type="number" min="1" value={line.soNgay} onChange={(event) => updateLine(line.localID, 'soNgay', event.target.value)} /></td>
                       <td><input type="number" min="0.01" step="0.01" value={line.maxLieuNgay} onChange={(event) => updateLine(line.localID, 'maxLieuNgay', event.target.value)} placeholder="Chưa đặt" /></td>
+                      <td>
+                        <select value={line.mucDoCanhBao} onChange={(event) => updateLine(line.localID, 'mucDoCanhBao', event.target.value)}>
+                          <option value="TUYET_DOI">Tuyệt đối</option>
+                          <option value="THAN_TRONG">Thận trọng</option>
+                        </select>
+                      </td>
                       <td className="generated-dose-cell">
                         <strong>{dose.tongLieuNgay}</strong>
                         <small>{dose.tongLieuDot} toàn đợt</small>
