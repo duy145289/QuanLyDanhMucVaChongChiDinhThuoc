@@ -1,4 +1,4 @@
-import { ClipboardList, PackageOpen, Pill, Plus, Save, Trash2 } from 'lucide-react';
+import { ClipboardList, PackageOpen, Pill, Plus, Save, ShieldAlert, Trash2 } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import MedicineAutocomplete from './MedicineAutocomplete.jsx';
 import { calculateLineDose } from '../utils/dose.js';
@@ -123,6 +123,9 @@ export default function PrescriptionWorkspace({ medicines, onNavigate }) {
           </button>
           <button className="nav-button active" type="button">
             <ClipboardList size={18} /> Đơn thuốc
+          </button>
+          <button className="nav-button" type="button" onClick={() => onNavigate('rules')}>
+            <ShieldAlert size={18} /> Chống chỉ định
           </button>
           <button className="nav-button" type="button">
             <PackageOpen size={18} /> Kho thuốc
