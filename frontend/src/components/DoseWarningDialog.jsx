@@ -1,9 +1,28 @@
 import { AlertTriangle, X } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
-export default function DoseWarningDialog({ warning, onClose }) {
+export default function DoseWarningDialog({ warning, onClose, onOverride }) {
+  const [overrideReason, setOverrideReason] = useState('');
+  const [reasonError, setReasonError] = useState('');
+
+  useEffect(() => {
+    setOverrideReason('');
+    setReasonError('');
+  }, [warning?.signature]);
+
   if (!warning) return null;
   const isAbsolute = warning.dose.isTuyetDoi;
   const toneClass = isAbsolute ? 'absolute-risk' : 'caution-risk';
+  const trimmedReason = overrideReason.trim();
+
+  function submitOverride() {
+    if (trimmedReason.length <= 10) {
+      setReasonError('Lý do bắt buộc dài hơn 10 ký tự.');
+      return;
+    }
+
+    onOverride?.(warning.signature, trimmedReason);
+  }
 
   return (
     <div className="dialog-backdrop" role="presentation">
@@ -30,8 +49,29 @@ export default function DoseWarningDialog({ warning, onClose }) {
               ? 'Cảnh báo đỏ mức Tuyệt đối yêu cầu điều chỉnh thuốc hoặc liều trước khi lưu.'
               : 'Hãy kiểm tra lại phác đồ và chỉ tiếp tục khi đã có lý do chuyên môn.'}
           </p>
+          {!isAbsolute && (
+            <label className="override-reason-field">
+              Lý do bỏ qua cảnh báo
+              <textarea
+                value={overrideReason}
+                onChange={(event) => {
+                  setOverrideReason(event.target.value);
+                  if (reasonError) setReasonError('');
+                }}
+                rows="3"
+                placeholder="Nhập lý do chuyên môn trước khi bỏ qua cảnh báo"
+              />
+              <span className="field-hint">{trimmedReason.length}/11 ký tự tối thiểu</span>
+              {reasonError && <span className="form-error">{reasonError}</span>}
+            </label>
+          )}
         </div>
         <div className="warning-dialog-actions">
+          {!isAbsolute && (
+            <button className="ghost-button" type="button" onClick={submitOverride}>
+              Bỏ qua cảnh báo
+            </button>
+          )}
           <button className="primary-button" type="button" onClick={onClose}>Điều chỉnh liều</button>
         </div>
       </section>
