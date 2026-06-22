@@ -48,6 +48,14 @@ async function getThuoc(thuocID) {
   return thuocRepository.findById(thuocID);
 }
 
+async function searchThuoc(filters) {
+  const limit = Math.min(Math.max(toInt(filters.limit, 8), 1), 20);
+  return thuocRepository.findSuggestions({
+    keyword: filters.keyword ? filters.keyword.trim() : '',
+    limit
+  });
+}
+
 async function createThuoc(payload) {
   const data = normalizeThuocPayload(payload);
   const errors = validateRequiredFields(data);
@@ -83,6 +91,7 @@ async function deleteThuoc(thuocID) {
 module.exports = {
   listThuoc,
   getThuoc,
+  searchThuoc,
   createThuoc,
   updateThuoc,
   deleteThuoc

@@ -34,6 +34,28 @@ async function findById(thuocID) {
   return result.recordset[0] ? mapThuoc(result.recordset[0]) : null;
 }
 
+async function findSuggestions({ keyword, limit = 8 }) {
+  const pool = await poolPromise;
+  const request = pool.request()
+    .input('keyword', sql.NVarChar(150), `%${keyword}%`)
+    .input('startsWith', sql.NVarChar(150), `${keyword}%`)
+    .input('limit', sql.Int, limit);
+
+  const result = await request.query(`
+    SELECT TOP (@limit) thuocID, maATC, tenThuongMai, hoatChat, hamLuong, donViTinh,
+           tonKhoHienTai, tonToiThieu
+    FROM Thuoc
+    WHERE @keyword = '%%'
+       OR maATC LIKE @keyword
+       OR tenThuongMai LIKE @keyword
+       OR hoatChat LIKE @keyword
+    ORDER BY CASE WHEN maATC LIKE @startsWith OR tenThuongMai LIKE @startsWith THEN 0 ELSE 1 END,
+             tenThuongMai
+  `);
+
+  return result.recordset.map(mapThuoc);
+}
+
 async function createThuoc(data) {
   const pool = await poolPromise;
   const result = await pool.request()
@@ -110,6 +132,7 @@ async function removeThuoc(thuocID) {
 module.exports = {
   findAll,
   findById,
+  findSuggestions,
   createThuoc,
   updateThuoc,
   removeThuoc

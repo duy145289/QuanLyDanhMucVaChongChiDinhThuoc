@@ -31,6 +31,18 @@ router.get('/', async (req, res) => {
   }
 });
 
+router.get('/search', async (req, res) => {
+  try {
+    const items = await thuocService.searchThuoc({
+      keyword: req.query.q || '',
+      limit: req.query.limit
+    });
+    return res.json(items);
+  } catch (error) {
+    return handleRouteError(res, error, 'Loi tim kiem thuoc');
+  }
+});
+
 router.get('/:id', async (req, res) => {
   try {
     const medicine = await thuocService.getThuoc(req.params.id);
