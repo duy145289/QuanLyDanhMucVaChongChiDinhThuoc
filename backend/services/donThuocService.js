@@ -1,4 +1,5 @@
 const donThuocRepository = require('../repositories/donThuocRepository');
+const { calculateDose } = require('../utils/dosageCalculator');
 
 function createPrescriptionCode() {
   const date = new Date().toISOString().slice(0, 10).replaceAll('-', '');
@@ -85,11 +86,21 @@ async function createPrescription(payload, user) {
   return donThuocRepository.createPrescription({ ...header, chiTiet });
 }
 
+function checkDose(payload) {
+  return calculateDose({
+    lieuMoiLan: payload.lieuMoiLan,
+    soLanNgay: payload.soLanNgay,
+    soNgay: payload.soNgay,
+    maxLieuNgay: payload.maxLieuNgay
+  });
+}
+
 module.exports = {
   listDonThuoc,
   getDonThuoc,
   createDraft,
   createPrescription,
+  checkDose,
   normalizeHeader,
   validateHeader,
   throwValidationError
