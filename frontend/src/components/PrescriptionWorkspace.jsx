@@ -1,6 +1,8 @@
 import { ClipboardList, PackageOpen, Pill, Plus, Save, Trash2 } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import MedicineAutocomplete from './MedicineAutocomplete.jsx';
+import { calculateLineDose } from '../utils/dose.js';
+import DoseWarningDialog from './DoseWarningDialog.jsx';
 
 function createLine(medicine) {
   return {
@@ -10,6 +12,7 @@ function createLine(medicine) {
     soLanNgay: 1,
     soNgay: 1,
     soLuong: 1,
+    maxLieuNgay: '',
     huongDan: ''
   };
 }
@@ -23,10 +26,34 @@ export default function PrescriptionWorkspace({ medicines, onNavigate }) {
   const [lines, setLines] = useState(() => [createLine(medicines[0])]);
   const [notice, setNotice] = useState('Đơn thuốc mới chưa được lưu.');
   const [saving, setSaving] = useState(false);
+  const [doseWarning, setDoseWarning] = useState(null);
+  const [dismissedWarning, setDismissedWarning] = useState('');
 
   const medicineById = useMemo(() => (
     medicines.reduce((map, medicine) => ({ ...map, [medicine.thuocID]: medicine }), {})
   ), [medicines]);
+
+  const activeDoseWarning = useMemo(() => {
+    for (const line of lines) {
+      const dose = calculateLineDose(line);
+      if (dose.vuotLieu) {
+        return {
+          line,
+          dose,
+          medicine: medicineById[line.thuocID],
+          signature: `${line.localID}:${dose.tongLieuNgay}:${dose.maxLieuNgay}`
+        };
+      }
+    }
+    return null;
+  }, [lines, medicineById]);
+
+  useEffect(() => {
+    if (activeDoseWarning && activeDoseWarning.signature !== dismissedWarning) {
+      setDoseWarning(activeDoseWarning);
+    }
+    if (!activeDoseWarning) setDoseWarning(null);
+  }, [activeDoseWarning, dismissedWarning]);
 
   function updateHeader(field, value) {
     setHeader((current) => ({ ...current, [field]: value }));
@@ -51,6 +78,12 @@ export default function PrescriptionWorkspace({ medicines, onNavigate }) {
   async function saveDraft() {
     if (!header.tenBenhNhan.trim()) {
       setNotice('Vui lòng nhập tên bệnh nhân trước khi lưu.');
+      return;
+    }
+
+    if (activeDoseWarning) {
+      setDoseWarning(activeDoseWarning);
+      setNotice('Không thể lưu khi đơn thuốc còn dòng vượt liều.');
       return;
     }
 
@@ -149,6 +182,8 @@ export default function PrescriptionWorkspace({ medicines, onNavigate }) {
                   <th>Liều/lần</th>
                   <th>Lần/ngày</th>
                   <th>Số ngày</th>
+                  <th>Giới hạn/ngày</th>
+                  <th>Tổng liều</th>
                   <th>Số lượng</th>
                   <th>Hướng dẫn</th>
                   <th aria-label="Xóa dòng" />
@@ -157,6 +192,7 @@ export default function PrescriptionWorkspace({ medicines, onNavigate }) {
               <tbody>
                 {lines.map((line) => {
                   const medicine = medicineById[line.thuocID];
+                  const dose = calculateLineDose(line);
                   return (
                     <tr key={line.localID}>
                       <td className="medicine-select-cell">
@@ -170,6 +206,11 @@ export default function PrescriptionWorkspace({ medicines, onNavigate }) {
                       <td><input type="number" min="0.01" step="0.01" value={line.lieuMoiLan} onChange={(event) => updateLine(line.localID, 'lieuMoiLan', event.target.value)} /></td>
                       <td><input type="number" min="1" value={line.soLanNgay} onChange={(event) => updateLine(line.localID, 'soLanNgay', event.target.value)} /></td>
                       <td><input type="number" min="1" value={line.soNgay} onChange={(event) => updateLine(line.localID, 'soNgay', event.target.value)} /></td>
+                      <td><input type="number" min="0.01" step="0.01" value={line.maxLieuNgay} onChange={(event) => updateLine(line.localID, 'maxLieuNgay', event.target.value)} placeholder="Chưa đặt" /></td>
+                      <td className="generated-dose-cell">
+                        <strong>{dose.tongLieuNgay}</strong>
+                        <small>{dose.tongLieuDot} toàn đợt</small>
+                      </td>
                       <td><input type="number" min="1" value={line.soLuong} onChange={(event) => updateLine(line.localID, 'soLuong', event.target.value)} /></td>
                       <td><input value={line.huongDan} onChange={(event) => updateLine(line.localID, 'huongDan', event.target.value)} placeholder="Sau ăn" /></td>
                       <td>
@@ -185,6 +226,13 @@ export default function PrescriptionWorkspace({ medicines, onNavigate }) {
           </div>
         </section>
       </section>
+      <DoseWarningDialog
+        warning={doseWarning}
+        onClose={() => {
+          setDismissedWarning(doseWarning?.signature || '');
+          setDoseWarning(null);
+        }}
+      />
     </main>
   );
 }
