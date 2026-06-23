@@ -10,11 +10,19 @@ interface DashboardProps {
 }
 
 const prescriptionTrend = [
-  { month: 'T1', donThuoc: 12 }, { month: 'T2', donThuoc: 19 }, { month: 'T3', donThuoc: 15 },
-  { month: 'T4', donThuoc: 22 }, { month: 'T5', donThuoc: 28 }, { month: 'T6', donThuoc: 24 },
-  { month: 'T7', donThuoc: 31 }, { month: 'T8', donThuoc: 27 }, { month: 'T9', donThuoc: 35 },
-  { month: 'T10', donThuoc: 29 }, { month: 'T11', donThuoc: 42 }, { month: 'T12', donThuoc: 38 },
+  { month: 'T1', donThuoc: 18, donThuocNamTruoc: 14 },
+  { month: 'T2', donThuoc: 21, donThuocNamTruoc: 17 },
+  { month: 'T3', donThuoc: 25, donThuocNamTruoc: 20 },
+  { month: 'T4', donThuoc: 28, donThuocNamTruoc: 22 },
+  { month: 'T5', donThuoc: 34, donThuocNamTruoc: 27 },
+  { month: 'T6', donThuoc: 29, donThuocNamTruoc: 26 },
 ];
+
+const calculateTrendGrowth = () => {
+  const currentTotal = prescriptionTrend.reduce((sum, item) => sum + item.donThuoc, 0);
+  const previousTotal = prescriptionTrend.reduce((sum, item) => sum + item.donThuocNamTruoc, 0);
+  return Math.round(((currentTotal - previousTotal) / previousTotal) * 100);
+};
 
 const PIE_COLORS = ['#0891b2', '#16a34a', '#ea580c', '#8b5cf6', '#f59e0b', '#ef4444'];
 
@@ -33,6 +41,7 @@ const STATUS_COLORS: Record<string, string> = {
 export function Dashboard({ currentUser, medicines, patients, prescriptions }: DashboardProps) {
   const today = new Date();
   const in30Days = new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000);
+  const trendGrowth = calculateTrendGrowth();
 
   const lowStockMeds = medicines.filter(m => m.tonKho < m.tonKhoToiThieu && m.trangThai);
   const expiredMeds = medicines.filter(m => new Date(m.hanDung) < today && m.trangThai);
@@ -93,11 +102,11 @@ export function Dashboard({ currentUser, medicines, patients, prescriptions }: D
           <div className="flex items-center justify-between mb-4">
             <div>
               <h3 className="text-gray-800 font-semibold">Đơn thuốc theo tháng</h3>
-              <p className="text-xs text-gray-500">Năm 2024</p>
+              <p className="text-xs text-gray-500">Năm 2026 (T1-T6, T6 đến 23/06)</p>
             </div>
             <div className="flex items-center gap-1 text-green-600 text-sm">
               <TrendingUp className="w-4 h-4" />
-              <span>+18%</span>
+              <span>+{trendGrowth}%</span>
             </div>
           </div>
           <ResponsiveContainer width="100%" height={200}>
